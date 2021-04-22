@@ -9,12 +9,10 @@ import java.awt.Point;
  **/
 class Asteroid {
     double x,y, dirX, dirY;
-    char c;
 
-    public Asteroid(int x, int y, char c) {
+    public Asteroid(int x, int y) {
         this.x = x;
         this.y = y;
-        this.c = c;
     }
 
     public void setSpeed(int x, int y, int time) {
@@ -49,7 +47,7 @@ class Solution {
             for(int j = 0; j < firstPictureRow.length(); j++) {
                 char c = firstPictureRow.charAt(j);
                 if(c!='.') {
-                    asteroids.put(c, new Asteroid(j, i, c));
+                    asteroids.put(c, new Asteroid(j, i));
                 }
             }
             smap[i] = in.next().toCharArray();
