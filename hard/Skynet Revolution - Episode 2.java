@@ -1,12 +1,12 @@
 import java.util.*;
 import java.io.*;
 import java.math.*;
+
 class Node {
     boolean gateway;
     List<Node> adj;
     Map<Node, Integer> distToNodes;
     int index;
-    int links = -1;
 
     public Node(int index) {
         adj = new ArrayList<>();
@@ -19,10 +19,8 @@ class Node {
     }
 
     public int getLinks() {
-        if(links != -1) return links;
-        int l = 0;
-        for (Node n : adj) if (n.gateway) l++;
-        links = l;
+        int links = 0;
+        for(Node n : adj) if(n.gateway) links++;
         return links;
     }
 }
@@ -36,7 +34,7 @@ class Player {
         int L = in.nextInt(); // the number of links
         int E = in.nextInt(); // the number of exit gateways
         Node[] nodes = new Node[N];
-        for (int i = 0; i < N; i++) {
+        for(int i = 0; i < N; i++) {
             nodes[i] = new Node(i);
         }
         for (int i = 0; i < L; i++) {
@@ -51,57 +49,52 @@ class Player {
             nodes[EI].gateway = true;
             gateways[i] = nodes[EI];
         }
-        for (Node n : nodes) {
+        for(Node n : nodes) {
             calcDist(n);
-            n.distToNodes.put(n, 0);
+            n.distToNodes.put(n,0);
         }
-        for (Node g : gateways) {
-            for (Node a : g.adj) {
-                a.distToNodes.put(g, 1);
+        for(Node g : gateways) {
+            for(Node a : g.adj) {
+                a.distToNodes.put(g,1);
             }
         }
         // game loop
-        out:
-        while (true) {
+        out:while (true) {
             int SI = in.nextInt(); // The index of the node on which the Skynet agent is positioned this turn
             Node cur = nodes[SI];
-            if(cur.getLinks() > 0) {
-                for (Node a : cur.adj) {
-                    if (a.gateway) {
-                        System.out.println(a.index + " " + cur.index);
-                        cur.adj.remove(a);
-                        a.adj.remove(cur);
-                        continue out;
-                    }
+            for(Node a : cur.adj) { // If there is a direct link to a gateway, sever it.
+                if(a.gateway) {
+                    System.out.println(a.index+" "+cur.index);
+                    cur.adj.remove(a);
+                    a.adj.remove(cur);
+                    continue out;
                 }
             }
             Map<Integer, Node[]> possible = new HashMap<>();
             int closest = Integer.MAX_VALUE;
             int maxlinks = 0;
-            loop:
-            for (Node g : gateways) {
-                for (Node a : g.adj) {
+            for(Node g : gateways) { 
+                for(Node a : g.adj) {
                     int links = a.getLinks();
                     List<Node> path = getPath(cur, a, new ArrayList<>());
                     int d = 0;
-                    for (Node p : path) {
-                        if (p.getLinks() == 0) d++;
+                    for(Node p : path) {
+                        if(p.getLinks() == 0) d++;
                     }
-                    if (d <= links && links >= maxlinks) {
+                    if(d <= links && links >= maxlinks) {
                         int dist = a.distToNodes.get(cur);
-                        if (d == links - 1) dist = -1;
-                        possible.put(dist, new Node[]{g, a});
+                        if(d == links-1) dist = -1;
+                        possible.put(dist, new Node[]{g,a});
                         closest = Math.min(closest, dist);
                         maxlinks = links;
-                        if(dist == -1) break loop;
                     }
                 }
             }
-            if (possible.isEmpty()) {
-                for (Node g : gateways) {
-                    if (!g.adj.isEmpty()) {
-                        for (Node a : g.adj) {
-                            System.out.println(g.index + " " + a.index);
+            if(possible.isEmpty()) {
+                for(Node g : gateways) {
+                    if(!g.adj.isEmpty()) {
+                        for(Node a : g.adj) {
+                            System.out.println(g.index + " "+a.index);
                             a.adj.remove(g);
                             g.adj.remove(a);
                             continue out;
@@ -110,7 +103,7 @@ class Player {
                 }
             }
             Node[] a = possible.get(closest);
-            System.out.println(a[0].index + " " + a[1].index);
+            System.out.println(a[0].index + " "+a[1].index);
             a[1].adj.remove(a[0]);
             a[0].adj.remove(a[1]);
         }
@@ -120,21 +113,21 @@ class Player {
         Queue<Node> toVisit = new LinkedList<>();
         List<Node> visited = new ArrayList<>();
         visited.add(root);
-        root.distToNodes.put(root, 0);
+        root.distToNodes.put(root,0);
         toVisit.add(root);
         int dist = 1;
-        while (!toVisit.isEmpty()) {
+        while(!toVisit.isEmpty()) {
             List<Node> adj = new ArrayList<>();
-            while (!toVisit.isEmpty()) {
+            while(!toVisit.isEmpty()) {
                 Node polled = toVisit.poll();
-                for (Node a : polled.adj) {
-                    if (!visited.contains(a) && !adj.contains(a) && !a.gateway) {
+                for(Node a : polled.adj) {
+                    if(!visited.contains(a) && !adj.contains(a) && !a.gateway) {
                         adj.add(a);
                     }
                 }
             }
-            for (Node n : adj) {
-                root.distToNodes.put(n, dist);
+            for(Node n : adj) {
+                root.distToNodes.put(n,dist);
                 visited.add(n);
                 toVisit.add(n);
             }
@@ -143,15 +136,16 @@ class Player {
     }
 
     static List<Node> getPath(Node start, Node end, List<Node> path) {
-        if (path.isEmpty())
+        if(path.isEmpty())
             path.add(start);
-        if (start == end) return path;
+
+        if(start == end) return path;
         Node temp = null;
         int dist = Integer.MAX_VALUE;
-        for (Node a : start.adj) {
-            if (a != end && a.gateway) continue;
+        for(Node a : start.adj) {
+            if(a != end && a.gateway) continue;
             int n = a.distToNodes.get(end);
-            if (n < dist) {
+            if(n < dist) {
                 dist = n;
                 temp = a;
             }
