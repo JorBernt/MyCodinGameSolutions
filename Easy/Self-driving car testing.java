@@ -9,11 +9,11 @@ import java.math.*;
 
 
 class Solver {
-    private Road road;
+    private final Road road;
     private Car car;
     private List<String> output;
 
-    public Solver(){
+    public Solver() {
         road = new Road();
         output = new ArrayList<>();
     }
@@ -31,30 +31,30 @@ class Solver {
     }
 
     public void print() {
-        for(String s : output) {
+        for (String s : output) {
             System.out.println(s);
         }
     }
 
-    private class Car {
+    private static class Car {
         private int x;
         private List<Integer> commands;
 
-        public Car (String input) {
+        public Car(String input) {
             String[] values = input.split(";");
-            x = Integer.parseInt(values[0])-1;
+            x = Integer.parseInt(values[0]) - 1;
             generateCommands(values);
         }
 
         public List<String> drive(List<String> road) {
             List<String> driveOnRoad = new ArrayList<>();
             int length = road.size();
-            for(int i = 0; i < length; i++) {
+            for (int i = 0; i < length; i++) {
                 String r = road.get(i);
                 x += commands.get(i);
                 StringBuilder sb = new StringBuilder();
-                for(int j = 0; j < r.length(); j++) {
-                    sb.append(j==x?"#":r.charAt(j));
+                for (int j = 0; j < r.length(); j++) {
+                    sb.append(j == x ? "#" : r.charAt(j));
                 }
                 driveOnRoad.add(sb.toString());
             }
@@ -62,31 +62,29 @@ class Solver {
         }
 
 
-
         private void generateCommands(String[] values) {
             commands = new ArrayList<>();
-            for(int i = 1; i < values.length; i++) {
+            for (int i = 1; i < values.length; i++) {
                 commands.addAll(parseCommand(values[i]));
             }
         }
 
         private List<Integer> parseCommand(String string) {
-            int repeat = Integer.parseInt(string.replaceAll("[\\D]",""));
-            String dir = string.replaceAll("[\\d]","");
+            int repeat = Integer.parseInt(string.replaceAll("[\\D]", ""));
+            String dir = string.replaceAll("[\\d]", "");
             int d = 0;
-            if(dir.equals("L")) {
+            if (dir.equals("L")) {
                 d = -1;
-            }
-            else if(dir.equals("R")) d = 1;
+            } else if (dir.equals("R")) d = 1;
             List<Integer> com = new ArrayList<>();
-            for(int i = 0; i < repeat; i++) com.add(d);
+            for (int i = 0; i < repeat; i++) com.add(d);
             return com;
         }
     }
 
 
-    private class Road {
-        private List<RoadPattern> patterns;
+    private static class Road {
+        private final List<RoadPattern> patterns;
 
         public Road() {
             patterns = new ArrayList<>();
@@ -99,16 +97,16 @@ class Solver {
 
         public List<String> getRoad() {
             List<String> road = new ArrayList<>();
-            for(RoadPattern p : patterns) {
+            for (RoadPattern p : patterns) {
                 road.addAll(p.getString());
             }
             return road;
         }
     }
 
-    private class RoadPattern {
-        private int repeats;
-        private String pattern;
+    private static class RoadPattern {
+        private final int repeats;
+        private final String pattern;
 
         public RoadPattern(String input) {
             String[] values = input.split(";");
@@ -118,7 +116,7 @@ class Solver {
 
         public List<String> getString() {
             List<String> strings = new ArrayList<>();
-            for(int i = 0; i < repeats; i++) {
+            for (int i = 0; i < repeats; i++) {
                 strings.add(pattern);
             }
             return strings;
@@ -127,10 +125,9 @@ class Solver {
 }
 
 
-
 class Solution {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         int N = in.nextInt();
         if (in.hasNextLine()) {
