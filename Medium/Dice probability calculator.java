@@ -60,14 +60,12 @@ class Solution {
                 for (int j = i + 1; j < s.length(); j++) {
                     if (s.charAt(j) == ')') {
                         String k = s.substring(i + 1, j);
-                        String op = "";
-                        for (String c : k.split("")) {
-                            if (c.matches("[-+*/<>]")) {
-                                op = c;
-                                break;
-                            }
-                        }
-                        int res = evalExp(k, op);
+                        Queue<String> ops = new LinkedList<>();
+                        ops.add("*");
+                        ops.add("/");
+                        ops.add("+");
+                        ops.add("-");
+                        int res = helper(k, ops);
                         s = s.replace(s.substring(i, j + 1), "" + res);
                         break;
                     }
