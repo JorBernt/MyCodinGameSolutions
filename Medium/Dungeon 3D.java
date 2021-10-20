@@ -33,16 +33,6 @@ class Node {
         return adjacent;
     }
 
-    public int getClosest() {
-        int min = Integer.MAX_VALUE;
-        for(Node n : adjacent) {
-            if(n.getDistance() != -1 && n.getDistance() < min) {
-                min = n.getDistance();
-            }
-        }
-        return min;
-    }
-
     public void setGoalDistance(int distance) {
         goalDistance = distance;
     }
@@ -96,10 +86,11 @@ class Solver {
                 Node node = new Node(x, y, level, c == '.');
                 if (c == 'A') {
                     start = node;
+                    node.setPassable();
                 } else if (c == 'S') {
                     goal = node;
                     goal.setGoalDistance(0);
-                    node.setPassable();
+                    
                 }
                 nodes.add(node);
             }
@@ -109,8 +100,8 @@ class Solver {
 
     public void solve() {
         calcDistance();
-        int minPath = start.getClosest();
-        System.out.println(minPath == Integer.MAX_VALUE ? "NO PATH" : minPath + 1);
+        int minPath = start.getDistance();
+        System.out.println(minPath == -1 ? "NO PATH" : minPath);
     }
 
     private void calcDistance() {
