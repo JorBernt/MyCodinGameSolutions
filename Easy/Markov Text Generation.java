@@ -40,19 +40,16 @@ class Solution {
 
     static Map<String, List<String>> createLookUp(String input, int width) {
         var lookup = new HashMap<String, List<String>>();
-        int n = 0;
         var substr = new ArrayList<String>();
         for (String s : input.split(" ")) {
-            if (n == width) {
+            if (substr.size() == width) {
                 String key = String.join(" ", substr);
                 if (!lookup.containsKey(key))
                     lookup.put(key, new ArrayList<>());
                 lookup.get(key).add(s);
-                n--;
                 substr.remove(0);
             }
             substr.add(s);
-            n++;
         }
         return lookup;
     }
