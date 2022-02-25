@@ -8,9 +8,9 @@ class MicroController {
 
     static private Map<String, Register> registerMap;
     static private Queue<Integer> input;
-    private static String[] CE = {"+", "-"};
-    private static String[] INSTRUCTION = {"mov", "add", "jmp", "sub", "mul", "not", "dgt", "dst", "teq", "tgt", "tlt", "tcp", "dgt", "dst"};
-    private static Map<String, Operation> labeledInstructions = new HashMap<>();
+    private static final String[] CE = {"+", "-"};
+    private static final String[] INSTRUCTION = {"mov", "add", "jmp", "sub", "mul", "not", "dgt", "dst", "teq", "tgt", "tlt", "tcp", "dgt", "dst"};
+    private static final Map<String, Operation> labeledInstructions = new HashMap<>();
     private static boolean CEisEnabled;
     private static CEType currentCEType;
     private final Register acc, dat, x0, x1;
@@ -66,7 +66,7 @@ class MicroController {
     }
 
     public void addInput(List<Integer> input) {
-        this.input.addAll(input);
+        MicroController.input.addAll(input);
     }
 
     public void instructionsBuilder(List<String> inputs) {
@@ -74,9 +74,8 @@ class MicroController {
         String superLabel = null;
         outer:
         for (String input : inputs) {
-            if (input.charAt(0) == '#') continue outer;
-            Queue<String> stack = new LinkedList<>();
-            stack.addAll(Arrays.asList(input.split(" ")));
+            if (input.charAt(0) == '#') continue;
+            Queue<String> stack = new LinkedList<>(Arrays.asList(input.split(" ")));
             Queue<String> regs = new LinkedList<>();
             String op = null;
             String label = null;
@@ -162,6 +161,7 @@ class MicroController {
                 default:
                     newOperation = null;
             }
+            if(newOperation == null) continue;
             if (isSingelOperation) newOperation.setSingleOperation(true);
             if (CE != null) {
                 newOperation.setEnabled(false);
@@ -207,18 +207,9 @@ class MicroController {
         REG
     }
 
-
-    interface Instruction {
-        boolean execute();
-
-        Instruction next();
-
-        boolean hasNext();
-    }
-
     static class Register {
         private int val;
-        private String type;
+        private final String type;
 
         public Register(String type) {
             this.val = 0;
@@ -230,7 +221,6 @@ class MicroController {
             val = n;
         }
 
-
         public int getVal() {
             if (type.equals("x0")) {
                 val = MicroController.readInput();
@@ -241,9 +231,7 @@ class MicroController {
         public void setVal(int val) {
             if (val < -999) {
                 this.val = -999;
-            } else if (val > 999) {
-                this.val = 999;
-            } else this.val = val;
+            } else this.val = Math.min(val, 999);
         }
 
         @Override
@@ -252,7 +240,7 @@ class MicroController {
         }
     }
 
-    static class Operation implements Instruction {
+    static class Operation  {
         protected final String label;
         protected String gotoLabel;
         protected CEType CE;
@@ -265,11 +253,6 @@ class MicroController {
             singleOperation = false;
             fired = false;
             enabled = true;
-        }
-
-        public Operation(String label, boolean enabled) {
-            this(label);
-            this.enabled = enabled;
         }
 
         public void setEnabled(boolean val) {
@@ -308,21 +291,14 @@ class MicroController {
             return (!singleOperation || !fired) && enabled;
         }
 
-        @Override
         public boolean execute() {
             fired = true;
             return true;
         }
 
-        @Override
         public Operation next() {
 
             return next;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
         }
     }
 
@@ -541,13 +517,11 @@ class MicroController {
             return false;
         }
     }
-
-
 }
 
 class Solution {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         int k = in.nextInt();
         List<Integer> input = new ArrayList<>();
